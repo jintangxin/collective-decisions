@@ -1,3 +1,10 @@
+function [FIM] = FIMfunction(c_bar, Tau)
+% a function wrapping SDEsolution into a function.
+% the goal is to input c_bar (Recurrent excitation) and Tau (Noise), and get a simulation path and compute its
+% FIM.
+
+% for example:
+% c_bar=1.1; Tau = 0.16;
 
 %% Part 1: get solution path for SDEs
 
@@ -8,11 +15,13 @@
 
 randn('state', 100);
 % parameters
-tau = 10; M = 500; c = 1.0/(M-1); s = 0.00; Tau = 0.16;
+tau = 10; M = 500; c = c_bar/(M-1); s = 0.03;
+
+
 % initiate X
 Xzeros = zeros(1,M);
 % time scale, total running time 1000ms
-T = 1000; N = 100; dt = T/N; 
+T = 1000; N = 1000; dt = T/N; 
 % solution repeat fequency, the more repeat, the more stable of solution.
 rep = 1;
 % initiate random variables dt*N(0, 0.16^2)
@@ -38,9 +47,9 @@ X = mean(Xem, 3);
 % (optional) plot solution path for X_1.
 % plot([1:dt:T], X(1,:), 'r--'), hold on
 
-%% Part 2 compute Markovian path fisher information estimator
+%% Part 2: compute Markovian path fisher information estimator
 
-% interested in s, get FIM for s.
+% interested in parameter 's'
 % initiate FIM
 FIM = 0;
 p = prob(X,tau,s,c,Tau,dt);
@@ -55,3 +64,7 @@ for j=1:N-1
     FIM = FIM + sum^2;
 end
 FIM = FIM/(N-1);
+
+
+
+end

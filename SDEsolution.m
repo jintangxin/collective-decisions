@@ -38,9 +38,9 @@ X = mean(Xem, 3);
 % (optional) plot solution path for X_1.
 % plot([1:dt:T], X(1,:), 'r--'), hold on
 
-%% Part 2 compute Markovian path fisher information estimator
+%% Part 2: compute Markovian path fisher information estimator
 
-%
+% interested in parameter 's'
 % initiate FIM
 FIM = 0;
 p = prob(X,tau,s,c,Tau,dt);

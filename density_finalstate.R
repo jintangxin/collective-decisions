@@ -13,9 +13,9 @@ timestep_silence <- time_silence/total_time*timesteps
 
 num_sims <- 100 # 2 #30 # number of simulations for each 'pixel'
 
-num_s <- 10 # number of different input signals we are looking at
+num_s <- 3 # number of different input signals we are looking at
 
-s <- seq(-0.4,0.4,length.out=num_s) # input signals 
+s <- seq(-0.1,0.1,length.out=num_s) # input signals 
 #s <- 0
 M <- 10 # number of individual neurons considered in this analysis
 tau <- rep(10,M) # in ms
@@ -86,6 +86,31 @@ for (k in 1:num_s){
       
 }
 
+###############KL divergence using kernel density estimator
+density <- function(x, data){
+  #density esimator from data using sd=h at new points x
+  h <- 1
+  n <- length(x) 
+  y <- array(0,dim=n)
+  for (i in 1:n){
+    y[i] <- 1/h * mean(dnorm(x[i], mean=data, sd=h))
+  }
+  return(y)
+}
+
+kl_divergence <- function(data1, data2){
+  # compute kl-divergence between data1 and data2
+  # using their density estimation
+  x = seq(-10,10,length.out = 1000) #initial points when compute kl-divergence
+  p <- density(x, data1)
+  q <- density(x, data2)
+  return(sum(p*log(p/q)))
+}
+
+# compute FIM by formula 5 in the draft.
+FIM = (kl_divergence(xf[2,], xf[1,]) + kl_divergence(xf[2,], xf[3,]))/(s[2]-s[1])^2
+
+
 
 ############################plot##################
 require(ggplot2)
@@ -108,13 +133,14 @@ for(i in 1:num_sims)
 
 
 #############KL divergence using FNN
-require(FNN)
-KLMatrix <- array(0,dim=c(num_s,num_s))
-for (i in 1:num_s){
-  for (j in 1:num_s){
-    KLMatrix[i,j] <- KL.divergence(X=xf[i,],Y=xf[j,], k=5)[5]
-  }
-}
+
+#require(FNN)
+#KLMatrix <- array(0,dim=c(num_s,num_s))
+#for (i in 1:num_s){
+#  for (j in 1:num_s){
+#    KLMatrix[i,j] <- KL.divergence(X=xf[i,],Y=xf[j,], k=5)[5]
+#  }
+#}
 
 ###############KL divergence using kernel density estimator
 density <- function(x, data){
@@ -145,5 +171,5 @@ for (i in 1:num_s){
   }
 }
 
-
+FIM = (kl_divergence(xf[2,], xf[1,]) + kl_divergence(xf[2,], xf[3,]))/(s[2]-s[1])^2
 
